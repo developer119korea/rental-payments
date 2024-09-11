@@ -1,9 +1,10 @@
-# Spring Payments 
-NestJs로 구현된 Payment API를 Spring으로 구현한 프로젝트입니다.
+# Rental Payments
+
+NestJS로 구현된 Rental Payments API를 Spring Boot로 마이그레이션
 
 ### Prerequisites
 
-- Java 21
-- Gradle
-- Postgres v15
-
+- Spring Boot v3.3.3
+- Java v21
+- Gradle v8.10
+- Postgres v15.8
