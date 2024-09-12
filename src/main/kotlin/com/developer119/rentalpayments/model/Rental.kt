@@ -1,17 +1,21 @@
 package com.developer119.rentalpayments.model
 
+import jakarta.persistence.*
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 import java.util.*
-import jakarta.persistence.*
-import jakarta.validation.constraints.*
 
 @Entity
 @Table(name = "rentals")
 class Rental {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", columnDefinition = "uuid")
-    var id: UUID? = UUID.randomUUID()
+    var id: UUID? = null // UUID는 자동 생성됨
 
     @NotBlank(message = "키는 필수 입력값입니다")
     @Column(name = "key", length = 255, nullable = false)
@@ -56,14 +60,10 @@ class Rental {
     @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime? = null
 
-    constructor()
-
     constructor(
-        id: UUID?, key: String?, status: String?, billingCode: String?, productName: String?,
-        installmentPlan: Int?, installmentAmount: Int?, paymentDay: Int?,
-        paymentPeriod: Int?, createdAt: LocalDateTime?, updatedAt: LocalDateTime?
+        key: String?, status: String?, billingCode: String?, productName: String?,
+        installmentPlan: Int?, installmentAmount: Int?, paymentDay: Int?, paymentPeriod: Int?
     ) {
-        this.id = id
         this.key = key
         this.status = status
         this.billingCode = billingCode
@@ -72,7 +72,18 @@ class Rental {
         this.installmentAmount = installmentAmount
         this.paymentDay = paymentDay
         this.paymentPeriod = paymentPeriod
-        this.createdAt = createdAt
-        this.updatedAt = updatedAt
+    }
+
+    // 엔티티가 저장되기 전에 호출되는 메서드 (생성 시점)
+    @PrePersist
+    fun onPrePersist() {
+        createdAt = LocalDateTime.now() // 생성일자 설정
+        updatedAt = LocalDateTime.now() // 처음 생성될 때 업데이트 일자도 설정
+    }
+
+    // 엔티티가 업데이트되기 전에 호출되는 메서드
+    @PreUpdate
+    fun onPreUpdate() {
+        updatedAt = LocalDateTime.now() // 업데이트 일자만 설정
     }
 }
