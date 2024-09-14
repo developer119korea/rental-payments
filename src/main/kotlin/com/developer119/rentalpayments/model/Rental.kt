@@ -86,4 +86,8 @@ class Rental {
     fun onPreUpdate() {
         updatedAt = LocalDateTime.now() // 업데이트 일자만 설정
     }
+
+    override fun toString(): String {
+        return "Rental(id=$id, key=$key, status=$status, billingCode=$billingCode, productName=$productName, installmentPlan=$installmentPlan, installmentAmount=$installmentAmount, paymentDay=$paymentDay, paymentPeriod=$paymentPeriod, createdAt=$createdAt, updatedAt=$updatedAt)"
+    }
 }
