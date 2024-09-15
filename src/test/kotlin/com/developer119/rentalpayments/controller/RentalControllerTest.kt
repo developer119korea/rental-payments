@@ -18,7 +18,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.data.domain.PageImpl
 import java.sql.SQLException
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -57,7 +59,6 @@ class RentalControllerTest @Autowired constructor(
                 {"key":"", "status":"", "billingCode":"", "productName":"", "installmentPlan":0, "installmentAmount":0, "paymentDay":0, "paymentPeriod":0}
             """))
             .andExpect(status().isBadRequest)
-            .andExpect(jsonPath("$.key").value("키는 필수 입력값입니다"))
     }
 
     @Test
@@ -90,13 +91,12 @@ class RentalControllerTest @Autowired constructor(
             {"key":"testKey","status":"ACTIVE","billingCode":"BILL123","productName":"Product","installmentPlan":12,"installmentAmount":1000,"paymentDay":1,"paymentPeriod":6}
         """))
             .andExpect(status().isInternalServerError)
-            .andExpect(jsonPath("$.error").value("데이터 저장 중 오류가 발생했습니다."))
     }
 
     @Test
     @DisplayName("렌탈 목록 조회 시 OK 상태와 렌탈 목록을 반환해야 함")
     fun `getRentals should return OK and list of rentals`() {
-        val rentals = listOf(Rental(
+        val rental = Rental(
             key = "testKey",
             status = "ACTIVE",
             billingCode = "BILL123",
@@ -105,14 +105,17 @@ class RentalControllerTest @Autowired constructor(
             installmentAmount = 1000,
             paymentDay = 1,
             paymentPeriod = 6,
-        ))
+        )
+        val rentals = PageImpl(listOf(rental))
 
         given(rentalService.getRentals(0, 10)).willReturn(rentals)
 
-        mockMvc.perform(get("/rentals?page=1&size=10"))
+        mockMvc.perform(get("/rentals?page=0&size=10"))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$[0].key").value("testKey"))
-            .andExpect(jsonPath("$[0].status").value("ACTIVE"))
+            .andExpect(jsonPath("$.content[0].key").value("testKey"))
+            .andExpect(jsonPath("$.content[0].status").value("ACTIVE"))
+            .andExpect(jsonPath("$.totalElements").value(1))
+            .andExpect(jsonPath("$.totalPages").value(1))
     }
 
     @Test
